@@ -1,0 +1,80 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: "${APP_NAME}_POSTGRES_${NODE_ENV}"
+    restart: unless-stopped
+    env_file:
+      - "${ENV_FILE}"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_EXTERNAL_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - development-network
+      - production-network
+
+  backend-dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: dev
+      args:
+        NODE_VERSION: ${NODE_VERSION}
+    container_name: "${APP_NAME}_APP_DEV"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    env_file:
+      - "${ENV_FILE}"
+    environment:
+      RUNNING_IN_DOCKER: "true"
+    command: ["npm", "run", "start:dev"]
+    ports:
+      - "${APP_EXTERNAL_PORT}:${APP_PORT}"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    networks:
+      - development-network
+    profiles:
+      - dev
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: prod
+      args:
+        NODE_VERSION: ${NODE_VERSION}
+    container_name: "${APP_NAME}_backend_prod"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    env_file:
+      - "${ENV_FILE}"
+    environment:
+      RUNNING_IN_DOCKER: "true"
+    command: ["sh", "-c", "npm run migrate:prod && npm run start:prod"]
+    ports:
+      - "${APP_EXTERNAL_PORT}:${APP_PORT}"
+    volumes:
+      - storage_data:/app/storage
+    networks:
+      - production-network
+    profiles:
+      - prod
+
+networks:
+  development-network:
+    driver: bridge
+  production-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  storage_data:
+  node_modules:

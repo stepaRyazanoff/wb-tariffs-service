@@ -1,0 +1,68 @@
+{
+    "name": "wb-tariffs-service",
+    "version": "0.0.2",
+    "description": "Сервис синхронизации тарифов WB (PostgreSQL + Google Sheets)",
+    "author": "https://github.com/stepaRyazanoff/",
+    "private": true,
+    "license": "UNLICENSED",
+    "scripts": {
+        "build": "nest build",
+        "start:dev": "ts-node-dev --respawn --transpile-only --poll src/main.ts",
+        "start:prod": "node dist/main",
+        "dev": "cross-env NODE_ENV=development nest start --watch",
+        "dev:db:up": "cross-env ENV_FILE=.env.development NODE_ENV=development docker compose --env-file .env.development up -d postgres",
+        "dev:db:down": "cross-env ENV_FILE=.env.development NODE_ENV=development docker compose --env-file .env.development down --remove-orphans",
+        "dev:up": "cross-env ENV_FILE=.env.development NODE_ENV=development docker compose --env-file .env.development --profile dev up -d --build --remove-orphans",
+        "dev:down": "cross-env ENV_FILE=.env.development NODE_ENV=development docker compose --env-file .env.development --profile dev down --remove-orphans",
+        "dev:logs": "cross-env ENV_FILE=.env.development NODE_ENV=development docker compose --env-file .env.development --profile dev logs -f backend-dev",
+        "dev:ps": "cross-env ENV_FILE=.env.development NODE_ENV=development docker compose --env-file .env.development --profile dev ps",
+        "prod:up": "cross-env ENV_FILE=.env.production NODE_ENV=production docker compose --env-file .env.production --profile prod up -d --build --remove-orphans",
+        "prod:down": "cross-env ENV_FILE=.env.production NODE_ENV=production docker compose --env-file .env.production --profile prod down --remove-orphans",
+        "prod:logs": "cross-env ENV_FILE=.env.production NODE_ENV=production docker compose --env-file .env.production --profile prod logs -f backend",
+        "prod:ps": "cross-env ENV_FILE=.env.production NODE_ENV=production docker compose --env-file .env.production --profile prod ps",
+        "migrate:dev": "cross-env NODE_ENV=development knex migrate:latest --knexfile knexfile.cjs",
+        "migrate:prod": "cross-env NODE_ENV=production knex migrate:latest --knexfile knexfile.cjs",
+        "migrate:make": "knex migrate:make --knexfile knexfile.cjs -x ts",
+        "lint": "eslint \"{src}/**/*.ts\" --fix",
+        "lint:check": "eslint \"src/**/*.ts\" --max-warnings=0",
+        "prettier": "prettier --write .",
+        "format:check": "prettier . --check",
+        "typecheck": "tsc -p tsconfig.json --noEmit"
+    },
+    "dependencies": {
+        "@nestjs/common": "^11.1.3",
+        "@nestjs/config": "^4.0.2",
+        "@nestjs/core": "^11.1.3",
+        "@nestjs/platform-express": "^11.1.3",
+        "@nestjs/schedule": "^6.1.1",
+        "cross-env": "^7.0.3",
+        "joi": "^17.13.3",
+        "knex": "^3.1.0",
+        "pg": "^8.19.0",
+        "reflect-metadata": "^0.2.2",
+        "rxjs": "^7.8.2"
+    },
+    "devDependencies": {
+        "@eslint/eslintrc": "^3.3.1",
+        "@eslint/js": "^9.29.0",
+        "@nestjs/cli": "^11.0.7",
+        "@nestjs/schematics": "^11.0.5",
+        "@types/express": "^5.0.3",
+        "@types/joi": "^17.2.3",
+        "@types/node": "^24.0.1",
+        "eslint": "^9.29.0",
+        "eslint-config-prettier": "^10.1.5",
+        "eslint-plugin-prettier": "^5.4.1",
+        "globals": "^16.2.0",
+        "prettier": "^3.5.3",
+        "ts-node-dev": "^2.0.0",
+        "tsconfig-paths": "^4.2.0",
+        "typescript": "^5.8.3",
+        "typescript-eslint": "^8.34.0"
+    },
+    "lint-staged": {
+        "**/*.{js,ts,json,md}": [
+            "prettier --write"
+        ]
+    }
+}
