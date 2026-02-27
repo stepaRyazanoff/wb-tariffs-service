@@ -9,7 +9,7 @@ import config from "./config";
             load: [config],
             isGlobal: true,
             validationSchema,
-            envFilePath: `.env.${process.env.NODE_ENV || "development"}`,
+            envFilePath: [".env", ".env.example"],
         }),
     ],
     exports: [NestConfigModule],
