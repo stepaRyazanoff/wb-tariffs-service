@@ -3,12 +3,14 @@ import { TariffsService } from "./tariffs.service";
 import { TariffsRepository } from "./tariffs.repository";
 import { WbClient } from "./wb-client";
 import { WB_API_TOKEN, WB_API_BASE_URL } from "./constants/wb.tokens";
+import { TariffsScheduler } from "./tariffs.scheduler";
 
 @Module({
     providers: [
         WbClient,
         TariffsService,
         TariffsRepository,
+        TariffsScheduler,
         {
             provide: WB_API_TOKEN,
             useFactory: () => {
