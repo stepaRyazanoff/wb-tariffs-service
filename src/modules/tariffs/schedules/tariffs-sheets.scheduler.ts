@@ -1,31 +1,31 @@
 import {
     Injectable,
     Logger,
-    OnModuleInit,
     OnModuleDestroy,
+    OnModuleInit,
 } from "@nestjs/common";
 import { SchedulerRegistry } from "@nestjs/schedule";
 import { ConfigService } from "@nestjs/config";
 import { CronJob } from "cron";
-import { TariffsService } from "./tariffs.service";
-import { todayISO } from "./utils/today-ISO";
-import { APP_CONFIG } from "../../common/app.constants";
+import { TariffsSheetsSyncService } from "../tariffs-sheets-sync.service";
+import { APP_CONFIG } from "../../../common/app.constants";
+import { todayISO } from "../utils/today-ISO";
 
 @Injectable()
-export class TariffsScheduler implements OnModuleInit, OnModuleDestroy {
-    private readonly logger = new Logger(TariffsScheduler.name);
-    private readonly jobName = "wb-tariffs-fetch";
+export class TariffsSheetsScheduler implements OnModuleInit, OnModuleDestroy {
+    private readonly logger = new Logger(TariffsSheetsScheduler.name);
+    private readonly jobName = "wb-tariffs-sheets-sync";
 
     constructor(
-        private readonly tariffsService: TariffsService,
+        private readonly syncService: TariffsSheetsSyncService,
         private readonly schedulerRegistry: SchedulerRegistry,
         private readonly configService: ConfigService,
     ) {}
 
     onModuleInit(): void {
         const cronExpr =
-            this.configService.get<string>("schedule.wbCron") ??
-            APP_CONFIG.CRON.DEFAULT_WB_CRON;
+            this.configService.get<string>("schedule.sheetsCron") ??
+            APP_CONFIG.CRON.DEFAULT_SHEETS_CRON;
 
         const timezone =
             this.configService.get<string>("schedule.timezone") ??
@@ -42,20 +42,21 @@ export class TariffsScheduler implements OnModuleInit, OnModuleDestroy {
             cronExpr,
             async () => {
                 const date = todayISO();
-
-                this.logger.log(`Запуск обновления тарифов WB (дата ${date})`);
+                this.logger.log(
+                    `Запуск синхронизации тарифов в Google Sheets (дата ${date})`,
+                );
 
                 try {
-                    await this.tariffsService.fetchAndStore(date);
+                    await this.syncService.syncDailyTariffsToSheets(date);
 
                     this.logger.log(
-                        `Тарифы WB успешно обновлены (дата ${date})`,
+                        `Синхронизация Google Sheets успешна (дата ${date})`,
                     );
                 } catch (err: unknown) {
                     const message =
                         err instanceof Error ? err.message : String(err);
                     this.logger.error(
-                        `Ошибка обновления тарифов WB (дата ${date}): ${message}`,
+                        `Ошибка синхронизации Google Sheets (дата ${date}): ${message}`,
                     );
                 }
             },
@@ -68,19 +69,16 @@ export class TariffsScheduler implements OnModuleInit, OnModuleDestroy {
         job.start();
 
         this.logger.log(
-            `Планировщик WB активирован: "${cronExpr}", TZ="${timezone}"`,
+            `Планировщик Sheets активирован: "${cronExpr}", TZ="${timezone}"`,
         );
     }
 
     onModuleDestroy(): void {
         try {
             const job = this.schedulerRegistry.getCronJob(this.jobName);
-
             void job.stop();
-
             this.schedulerRegistry.deleteCronJob(this.jobName);
-
-            this.logger.log(`Планировщик WB остановлен: "${this.jobName}"`);
+            this.logger.log(`Планировщик Sheets остановлен: "${this.jobName}"`);
         } catch {
             // ok
         }

@@ -25,8 +25,27 @@ export const APP_CONFIG = {
          */
         DEFAULT_WB_CRON: "0 * * * *",
         /**
+         * Cron для запуска синхронизации таблиц каждые 10 минут
+         */
+        DEFAULT_SHEETS_CRON: "*/10 * * * *",
+        /**
          * Europe/Moscow — московское время
          */
         DEFAULT_TIMEZONE: "Europe/Moscow",
-    },
+    } as const,
+
+    GOOGLE: {
+        /**
+         * Scope для доступа к Google Sheets API
+         */
+        SPREADSHEETS_SCOPE: "https://www.googleapis.com/auth/spreadsheets",
+        /**
+         * Режим записи значений в Google Sheets
+         */
+        VALUE_INPUT_OPTION_RAW: "RAW",
+        /**
+         * Стартовая ячейка для записи данных
+         */
+        START_CELL: "A1",
+    } as const,
 };
