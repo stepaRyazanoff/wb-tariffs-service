@@ -28,5 +28,6 @@ export default () => ({
     schedule: {
         wbCron: process.env.WB_CRON || "0 * * * *",
         sheetsCron: process.env.SHEETS_CRON || "*/10 * * * *",
+        timezone: process.env.WB_TZ || "Europe/Moscow",
     },
 });
