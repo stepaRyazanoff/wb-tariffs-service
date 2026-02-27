@@ -23,4 +23,5 @@ export const validationSchema: Joi.ObjectSchema = Joi.object({
 
     WB_CRON: Joi.string().optional(),
     SHEETS_CRON: Joi.string().optional(),
+    WB_TZ: Joi.string().optional(),
 });
