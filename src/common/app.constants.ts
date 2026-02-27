@@ -18,4 +18,15 @@ export const APP_CONFIG = {
          */
         WB_TARIFFS_BOX_PATH: "/api/v1/tariffs/box",
     } as const,
+
+    CRON: {
+        /**
+         * "0 * * * *" — запуск каждый час в начале часа
+         */
+        DEFAULT_WB_CRON: "0 * * * *",
+        /**
+         * Europe/Moscow — московское время
+         */
+        DEFAULT_TIMEZONE: "Europe/Moscow",
+    },
 };
