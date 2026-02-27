@@ -13,7 +13,7 @@ export default () => ({
 
     wb: {
         token: process.env.WB_API_TOKEN,
-        tariffsBoxUrl: "https://common-api.wildberries.ru/api/v1/tariffs/box",
+        wbApiBaseUrl: process.env.WB_API_BASE_URL,
     },
 
     sheets: {

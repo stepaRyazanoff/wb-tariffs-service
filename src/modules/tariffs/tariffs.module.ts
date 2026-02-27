@@ -7,6 +7,7 @@ import { TariffsScheduler } from "./schedules/tariffs.scheduler";
 import { TariffsSheetsScheduler } from "./schedules/tariffs-sheets.scheduler";
 import { TariffsSheetsSyncService } from "./tariffs-sheets-sync.service";
 import { GoogleSheetsModule } from "../google-sheets/google-sheets.module";
+import { ConfigService } from "@nestjs/config";
 
 @Module({
     imports: [GoogleSheetsModule],
@@ -19,21 +20,27 @@ import { GoogleSheetsModule } from "../google-sheets/google-sheets.module";
         TariffsSheetsSyncService,
         {
             provide: WB_API_TOKEN,
-            useFactory: () => {
-                const token = process.env.WB_API_TOKEN;
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => {
+                const token = config.get<string>("wb.token");
+
                 if (!token) {
                     throw new Error("Конфигурация: не задан WB_API_TOKEN");
                 }
+
                 return token;
             },
         },
         {
             provide: WB_API_BASE_URL,
-            useFactory: () => {
-                const url = process.env.WB_API_BASE_URL;
+            inject: [ConfigService],
+            useFactory: (config: ConfigService) => {
+                const url = config.get<string>("wb.wbApiBaseUrl");
+
                 if (!url) {
                     throw new Error("Конфигурация: не задан WB_API_BASE_URL");
                 }
+
                 return url;
             },
         },

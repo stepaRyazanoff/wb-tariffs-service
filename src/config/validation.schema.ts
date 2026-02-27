@@ -14,6 +14,7 @@ export const validationSchema: Joi.ObjectSchema = Joi.object({
     POSTGRES_DB: Joi.string().required(),
 
     WB_API_TOKEN: Joi.string().required(),
+    WB_API_BASE_URL: Joi.string().uri().required(),
 
     GOOGLE_SHEETS_IDS: Joi.string().required(),
     GOOGLE_SHEETS_TAB: Joi.string().default("stocks_coefs"),
