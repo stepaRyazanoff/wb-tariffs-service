@@ -25,6 +25,10 @@ export const APP_CONFIG = {
          */
         DEFAULT_WB_CRON: "0 * * * *",
         /**
+         * Cron для запуска синхронизации таблиц каждые 10 минут
+         */
+        DEFAULT_SHEETS_CRON: "*/10 * * * *",
+        /**
          * Europe/Moscow — московское время
          */
         DEFAULT_TIMEZONE: "Europe/Moscow",

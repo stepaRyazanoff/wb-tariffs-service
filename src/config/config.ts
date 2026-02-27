@@ -1,3 +1,5 @@
+import { APP_CONFIG } from "../common/app.constants";
+
 export default () => ({
     port: parseInt(process.env.APP_PORT || "3000", 10),
 
@@ -26,8 +28,9 @@ export default () => ({
     },
 
     schedule: {
-        wbCron: process.env.WB_CRON || "0 * * * *",
-        sheetsCron: process.env.SHEETS_CRON || "*/10 * * * *",
-        timezone: process.env.WB_TZ || "Europe/Moscow",
+        wbCron: process.env.WB_CRON || APP_CONFIG.CRON.DEFAULT_WB_CRON,
+        sheetsCron:
+            process.env.SHEETS_CRON || APP_CONFIG.CRON.DEFAULT_SHEETS_CRON,
+        timezone: process.env.WB_TZ || APP_CONFIG.CRON.DEFAULT_TIMEZONE,
     },
 });
