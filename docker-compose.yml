@@ -4,7 +4,7 @@ services:
         container_name: wb_service_postgres
         restart: unless-stopped
         env_file:
-            - .env
+            - .env.example
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
@@ -28,7 +28,7 @@ services:
         depends_on:
             - postgres
         env_file:
-            - .env
+            - .env.example
         environment:
             RUNNING_IN_DOCKER: "true"
         command: ["sh", "-c", "npm run migrate:dev && npm run start:dev"]
