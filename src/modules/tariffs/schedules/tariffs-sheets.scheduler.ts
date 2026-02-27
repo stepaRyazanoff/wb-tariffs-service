@@ -41,7 +41,7 @@ export class TariffsSheetsScheduler implements OnModuleInit, OnModuleDestroy {
         const job = new CronJob(
             cronExpr,
             async () => {
-                const date = todayISO();
+                const date = todayISO(timezone);
                 this.logger.log(
                     `Запуск синхронизации тарифов в Google Sheets (дата ${date})`,
                 );
