@@ -50,22 +50,38 @@ export class GoogleSheetsService {
             buildTariffsSheetHeader(),
             ...rows.map(row => mapTariffsSheetRowToValues(row)),
         ];
+        const failedSpreadsheetIds: string[] = [];
 
         for (const spreadsheetId of this.spreadsheetIds) {
-            await this.sheets.spreadsheets.values.clear({
-                spreadsheetId,
-                range: this.sheetName,
-            });
+            try {
+                await this.sheets.spreadsheets.values.clear({
+                    spreadsheetId,
+                    range: this.sheetName,
+                });
 
-            await this.sheets.spreadsheets.values.update({
-                spreadsheetId,
-                range: `${this.sheetName}!${APP_CONFIG.GOOGLE.START_CELL}`,
-                valueInputOption: APP_CONFIG.GOOGLE.VALUE_INPUT_OPTION_RAW,
-                requestBody: { values },
-            });
+                await this.sheets.spreadsheets.values.update({
+                    spreadsheetId,
+                    range: `${this.sheetName}!${APP_CONFIG.GOOGLE.START_CELL}`,
+                    valueInputOption: APP_CONFIG.GOOGLE.VALUE_INPUT_OPTION_RAW,
+                    requestBody: { values },
+                });
 
-            this.logger.log(
-                `Google Sheets: обновил ${spreadsheetId} (${this.sheetName}), строк: ${rows.length}`,
+                this.logger.log(
+                    `Google Sheets: обновил ${spreadsheetId} (${this.sheetName}), строк: ${rows.length}`,
+                );
+            } catch (err: unknown) {
+                const message =
+                    err instanceof Error ? err.message : String(err);
+                failedSpreadsheetIds.push(spreadsheetId);
+                this.logger.error(
+                    `Google Sheets: ошибка обновления ${spreadsheetId} (${this.sheetName}): ${message}`,
+                );
+            }
+        }
+
+        if (failedSpreadsheetIds.length > 0) {
+            throw new Error(
+                `Google Sheets: не удалось обновить ${failedSpreadsheetIds.length} из ${this.spreadsheetIds.length} таблиц: ${failedSpreadsheetIds.join(", ")}`,
             );
         }
     }

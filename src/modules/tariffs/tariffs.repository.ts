@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import {
     WbBoxTariffDailyInsert,
     WbBoxTariffDailyRow,
@@ -9,6 +9,7 @@ import { KNEX } from "../../infrastructure/database/constants/database.constants
 
 @Injectable()
 export class TariffsRepository {
+    private readonly logger = new Logger(TariffsRepository.name);
     private readonly table = "wb_box_tariffs_daily";
 
     constructor(@Inject(KNEX) private readonly db: Knex) {}
@@ -18,10 +19,31 @@ export class TariffsRepository {
             return;
         }
 
+        const dedupedRows = this.dedupeRowsByDateAndWarehouse(rows);
+
         await this.db<WbBoxTariffDailyInsert>(this.table)
-            .insert(rows)
+            .insert(dedupedRows)
             .onConflict(["tariff_date", "warehouse_name"])
             .merge();
+    }
+
+    private dedupeRowsByDateAndWarehouse(
+        rows: WbBoxTariffDailyInsert[],
+    ): WbBoxTariffDailyInsert[] {
+        const uniqueRows = new Map<string, WbBoxTariffDailyInsert>();
+
+        for (const row of rows) {
+            const key = `${row.tariff_date}::${row.warehouse_name}`;
+            uniqueRows.set(key, row);
+        }
+
+        if (uniqueRows.size < rows.length) {
+            this.logger.warn(
+                `WB upsert: найдено дублей в батче: ${rows.length - uniqueRows.size}, применена дедупликация по (tariff_date, warehouse_name)`,
+            );
+        }
+
+        return Array.from(uniqueRows.values());
     }
 
     async getDailyTariffsForSheets(
