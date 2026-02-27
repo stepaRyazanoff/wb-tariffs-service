@@ -41,7 +41,7 @@ export class TariffsScheduler implements OnModuleInit, OnModuleDestroy {
         const job = new CronJob(
             cronExpr,
             async () => {
-                const date = todayISO();
+                const date = todayISO(timezone);
 
                 this.logger.log(`Запуск обновления тарифов WB (дата ${date})`);
 
