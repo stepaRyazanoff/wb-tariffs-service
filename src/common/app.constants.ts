@@ -28,5 +28,20 @@ export const APP_CONFIG = {
          * Europe/Moscow — московское время
          */
         DEFAULT_TIMEZONE: "Europe/Moscow",
-    },
+    } as const,
+
+    GOOGLE: {
+        /**
+         * Scope для доступа к Google Sheets API
+         */
+        SPREADSHEETS_SCOPE: "https://www.googleapis.com/auth/spreadsheets",
+        /**
+         * Режим записи значений в Google Sheets
+         */
+        VALUE_INPUT_OPTION_RAW: "RAW",
+        /**
+         * Стартовая ячейка для записи данных
+         */
+        START_CELL: "A1",
+    } as const,
 };

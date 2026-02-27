@@ -27,7 +27,7 @@ export class TariffsRepository {
     async getDailyTariffsForSheets(
         dateISO: string,
     ): Promise<WbBoxTariffForSheets[]> {
-        const rows = await this.db<WbBoxTariffDailyRow>(this.table)
+        return this.db<WbBoxTariffDailyRow>(this.table)
             .select(
                 "warehouse_name",
                 "geo_name",
@@ -42,9 +42,7 @@ export class TariffsRepository {
                 "box_storage_liter",
                 "fetched_at",
             )
-            .where("tariff_date", dateISO)
-            .orderByRaw("box_delivery_coef_expr::numeric asc nulls last");
-
-        return rows;
+            .where({ tariff_date: dateISO })
+            .orderByRaw("box_delivery_coef_expr asc nulls last");
     }
 }
